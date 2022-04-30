@@ -2,6 +2,13 @@ import random
 
 from datacenter.models import Schoolkid, Chastisement, Lesson, Commendation, Mark
 
+def get_child(name):
+    try:
+        return Schoolkid.objects.get(full_name__contains = name)
+    except Schoolkid.DoesNotExist:
+        print('Такого ученика нет в базе данных.\n Проверьте имя')
+    except Schoolkid.MultipleObjectsReturned:
+        print('Найдено несколько учеников. Уточните имя')
 
 def fix_marks(schoolkid):
     Mark.objects.filter(schoolkid = schoolkid).filter(points__lt = 4).update(points = 5)
@@ -9,7 +16,7 @@ def fix_marks(schoolkid):
 def  remove_chastisements(schoolkid):
     Chastisement.objects.filter(schoolkid = schoolkid).delete()
     
-def create_commendation(name, subject):
+def create_commendation(child, subject):
     text = random.choice([
         'Молодец!',
         "Отлично!",
@@ -18,11 +25,14 @@ def create_commendation(name, subject):
         "Сказано здорово – просто и ясно!", 
         "Уже существенно лучше!"
     ])
-    child = Schoolkid.objects.get(full_name__contains = name)
-    lesson1 = Lesson.objects.filter(group_letter = child.group_letter
-                                    ).filter(year_of_study = child.year_of_study
-                                             ).filter(subject__title__contains = subject
-                                                      ).order_by('-date')[0]
+    try:
+        lesson1 = Lesson.objects.filter(group_letter = child.group_letter
+                                        ).filter(year_of_study = child.year_of_study
+                                                ).filter(subject__title__icontains = subject
+                                                        ).order_by('-date')[0]
+    except IndexError:
+        print('Не удалось найти ни одного такого урока у этого ученика.\n Проверьте название предмета')
+        return
     Commendation.objects.create(
         text = text, 
         subject = lesson1.subject, 
