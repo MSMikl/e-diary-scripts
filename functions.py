@@ -14,8 +14,10 @@ def get_child(name):
 
 def fix_marks(schoolkid):(
         Mark.objects
-        .filter(schoolkid=schoolkid)
-        .filter(points__lt=4)
+        .filter(
+            schoolkid=schoolkid,
+            points__lt=4
+        )
         .update(points=5)
     )
 
