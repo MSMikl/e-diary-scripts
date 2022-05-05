@@ -12,11 +12,12 @@ def get_child(name):
         print('Найдено несколько учеников. Уточните имя')
 
 
-def fix_marks(schoolkid):
-    Mark.objects.filter(
-        schoolkid=schoolkid).filter(
-            points__lt=4
-        ).update(points=5)
+def fix_marks(schoolkid):(
+        Mark.objects
+        .filter(schoolkid=schoolkid)
+        .filter(points__lt=4)
+        .update(points=5)
+    )
 
 
 def remove_chastisements(schoolkid):
@@ -34,12 +35,14 @@ def create_commendation(child, subject):
     ])
     try:
         lesson = (
-            Lesson.objects.filter(
+            Lesson.objects
+            .filter(
                 group_letter=child.group_letter,
                 year_of_study=child.year_of_study,
                 subject__title=subject
             )
-            .order_by('-date')[0]
+            .order_by('-date')
+            [0]
         )
     except IndexError:
         print(
